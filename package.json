@@ -1,6 +1,8 @@
 {
-  "name": "react-native-biometrics-sign",
-  "version": "0.2.1",
+  "author": "bnnsoftvn",
+  "contributors": [],
+  "name": "react-native-biometrics-sic",
+  "version": "1.0.0",
   "summary": "A React Native library for biometrics",
   "description": "React Native biometric functionality for signing and encryption",
   "main": "build/cjs/index.js",
@@ -24,23 +26,21 @@
     "touch-id",
     "face-id"
   ],
-  "homepage": "https://github.com/tailgbga2/react-native-biometrics-sign",
-  "contributors": [],
+  "homepage": "https://github.com/bnnsoftvn/react-native-biometrics-sic",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tailgbga2/react-native-biometrics-sign.git"
+    "url": "git+https://github.com/bnnsoftvn/react-native-biometrics-sic.git"
   },
   "private": false,
-  "author": "Ngô Tuấn Tài <taideveloperapp@gmail.com> (https://github.com/taingo97)",
-  "authorname": "react-native-biometrics",
+  "authorname": "taingo97",
   "license": "MIT",
   "peerDependencies": {
     "react-native": ">=0.60.0"
   },
-  "bugs": {
-    "url": "https://github.com/SelfLender/react-native-biometrics/issues"
-  },
   "devDependencies": {
     "typescript": "^3.7.2"
+  },
+  "bugs": {
+    "url": "https://github.com/bnnsoftvn/react-native-biometrics-sic/issues"
   }
 }
