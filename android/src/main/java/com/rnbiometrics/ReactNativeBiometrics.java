@@ -122,6 +122,28 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     // }
 
     @ReactMethod
+    public void getPublicKey(final String keytag, Promise promise) {
+        if(keytag.isEmpty()){
+            promise.reject("keytag is empty", "keytag is empty");
+        }else{
+            try{
+                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                keyStore.load(null);
+                PublicKey publicKey = keyStore.getCertificate(keytag).getPublicKey();
+                byte[] encodedPublicKey = publicKey.getEncoded();
+                String publicKeyString = Base64.encodeToString(encodedPublicKey, Base64.DEFAULT);
+                publicKeyString = publicKeyString.replaceAll("\r", "").replaceAll("\n", "");
+
+                WritableMap resultMap = new WritableNativeMap();
+                resultMap.putString("publicKey", publicKeyString);
+                promise.resolve(resultMap);
+            }catch (Exception ex){
+                promise.reject("Get publickey error", "Get publickey error");
+            }
+        }
+    }
+
+    @ReactMethod
     public void createKeys(final ReadableMap params, Promise promise) {
         try {
             if (isCurrentSDKMarshmallowOrLater()) {

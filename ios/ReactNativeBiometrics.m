@@ -112,6 +112,38 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
   });
 }
 
+RCT_EXPORT_METHOD(getPublicKey:(NSString *)keytag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      NSData *biometricKeyTag = [self getBiometricKeyTag:keytag];
+    NSDictionary *query = @{
+        (id)kSecClass: (id)kSecClassKey,
+        (id)kSecAttrApplicationTag: biometricKeyTag,
+        (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+        (id)kSecReturnRef: @YES,
+        (id)kSecUseOperationPrompt: @"Get publickey"
+        
+                            };
+    SecKeyRef privateKey;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
+      if (status == errSecSuccess) {
+          id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
+          CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
+          NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
+          NSData *publicKeyDataWithHeader = [self addHeaderPublickey:publicKeyData];
+          NSString *publicKeyString = [publicKeyDataWithHeader base64EncodedStringWithOptions:0];
+
+          NSDictionary *result = @{
+            @"publicKey": publicKeyString,
+          };
+          resolve(result);
+      }
+      else{
+          NSString *message = [NSString stringWithFormat:@"Get public error: %@", @"No get publickey"];
+          reject(@"storage_error", message, nil);
+      }
+  });
+}
+
 RCT_EXPORT_METHOD(deleteKeys:(NSString *)keytag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       BOOL biometricKeyExists = [self doesBiometricKeyExist:keytag];

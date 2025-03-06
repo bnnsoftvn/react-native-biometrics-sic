@@ -21,6 +21,10 @@ interface CreateKeysResult {
   publicKey: string
 }
 
+interface PublicKeysResult {
+  publicKey: string
+}
+
 interface BiometricKeysExistResult {
   keysExist: boolean
 }
@@ -95,6 +99,10 @@ export module ReactNativeBiometricsLegacy {
    */
   export function createKeys(CreateKeysOptions: CreateKeysOptions): Promise<CreateKeysResult> {
     return new ReactNativeBiometrics().createKeys(CreateKeysOptions)
+  }
+
+  export function getPublicKey(keytag: string): Promise<PublicKeysResult> {
+    return new ReactNativeBiometrics().getPublicKey(keytag)
   }
 
   /**
@@ -173,6 +181,10 @@ export default class ReactNativeBiometrics {
      */
     createKeys(CreateKeysOptions: CreateKeysOptions): Promise<CreateKeysResult> {
       return bridge.createKeys(CreateKeysOptions)
+    }
+
+    getPublicKey(keytag: string): Promise<PublicKeysResult> {
+      return bridge.getPublicKey(keytag)
     }
 
     /**

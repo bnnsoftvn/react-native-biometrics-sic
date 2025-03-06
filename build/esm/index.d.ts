@@ -13,6 +13,9 @@ interface IsSensorAvailableResult {
 interface CreateKeysResult {
     publicKey: string;
 }
+interface PublicKeysResult {
+    publicKey: string;
+}
 interface BiometricKeysExistResult {
     keysExist: boolean;
 }
@@ -74,6 +77,7 @@ export declare namespace ReactNativeBiometricsLegacy {
      * @returns {Promise<Object>}  Promise that resolves to object with details about the newly generated public key
      */
     function createKeys(CreateKeysOptions: CreateKeysOptions): Promise<CreateKeysResult>;
+    function getPublicKey(keytag: string): Promise<PublicKeysResult>;
     /**
      * Returns promise that resolves to an object with object.keysExists = true | false
      * indicating if the keys were found to exist or not
@@ -127,6 +131,7 @@ export default class ReactNativeBiometrics {
      * @returns {Promise<Object>}  Promise that resolves to object with details about the newly generated public key
      */
     createKeys(CreateKeysOptions: CreateKeysOptions): Promise<CreateKeysResult>;
+    getPublicKey(keytag: string): Promise<PublicKeysResult>;
     /**
      * Returns promise that resolves to an object with object.keysExists = true | false
      * indicating if the keys were found to exist or not
