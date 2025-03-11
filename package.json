@@ -27,12 +27,16 @@
     "face-id"
   ],
   "homepage": "https://github.com/bnnsoftvn/react-native-biometrics-sic",
+  "contributors": [],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bnnsoftvn/react-native-biometrics-sic.git"
   },
-  "private": false,
-  "authorname": "taingo97",
+  "private": true,
+  "author": {
+    "name": "Taingo97",
+    "url": "https://github.com/bnnsoftvn"
+  },
   "license": "MIT",
   "peerDependencies": {
     "react-native": ">=0.60.0"
