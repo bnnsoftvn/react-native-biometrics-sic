@@ -51,6 +51,10 @@ export var ReactNativeBiometricsLegacy;
         return new ReactNativeBiometrics().getPublicKey(keytag);
     }
     ReactNativeBiometricsLegacy.getPublicKey = getPublicKey;
+    function createCsr(CreateCsrOptions) {
+        return new ReactNativeBiometrics().createCsr(CreateCsrOptions);
+    }
+    ReactNativeBiometricsLegacy.createCsr = createCsr;
     /**
      * Returns promise that resolves to an object with object.keysExists = true | false
      * indicating if the keys were found to exist or not
@@ -128,6 +132,9 @@ var ReactNativeBiometrics = /** @class */ (function () {
     };
     ReactNativeBiometrics.prototype.getPublicKey = function (keytag) {
         return bridge.getPublicKey(keytag);
+    };
+    ReactNativeBiometrics.prototype.createCsr = function (CreateCsrOptions) {
+        return bridge.createCsr(CreateCsrOptions);
     };
     /**
      * Returns promise that resolves to an object with object.keysExists = true | false

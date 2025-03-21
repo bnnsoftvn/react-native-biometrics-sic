@@ -144,6 +144,14 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void createCsr(final ReadableMap params, Promise promise) {
+         WritableMap resultMap = new WritableNativeMap();
+        resultMap.putBoolean("success", false);
+        resultMap.putString("error", "This function is only supported on iOS.");
+        promise.resolve(resultMap);
+    }
+
+    @ReactMethod
     public void createKeys(final ReadableMap params, Promise promise) {
         try {
             if (isCurrentSDKMarshmallowOrLater()) {

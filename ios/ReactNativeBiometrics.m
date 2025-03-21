@@ -114,34 +114,119 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
 
 RCT_EXPORT_METHOD(getPublicKey:(NSString *)keytag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+     NSDictionary *result = @{
+        @"publicKey": @"ios",
+      };
+      resolve(result);
+    //   NSData *biometricKeyTag = [self getBiometricKeyTag:keytag];
+    // NSDictionary *query = @{
+    //     (id)kSecClass: (id)kSecClassKey,
+    //     (id)kSecAttrApplicationTag: biometricKeyTag,
+    //     (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+    //     (id)kSecReturnRef: @YES,
+    //     (id)kSecUseOperationPrompt: @"Get publickey"
+        
+    //                         };
+    // SecKeyRef privateKey;
+    // OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
+    //   if (status == errSecSuccess) {
+    //       id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
+    //       CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
+    //       NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
+    //       NSData *publicKeyDataWithHeader = [self addHeaderPublickey:publicKeyData];
+    //       NSString *publicKeyString = [publicKeyDataWithHeader base64EncodedStringWithOptions:0];
+
+    //       NSDictionary *result = @{
+    //         @"publicKey": publicKeyString,
+    //       };
+    //       resolve(result);
+    //   }
+    //   else{
+    //       NSString *message = [NSString stringWithFormat:@"Get public error: %@", @"No get publickey"];
+    //       reject(@"storage_error", message, nil);
+    //   }
+  });
+}
+
+RCT_EXPORT_METHOD(createCsr: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
+    NSString *payload = [RCTConvert NSString:params[@"payload"]];
+    NSString *keytag = [RCTConvert NSString:params[@"keytag"]];
+    NSString *subject = [RCTConvert NSString:params[@"subject"]];
+
       NSData *biometricKeyTag = [self getBiometricKeyTag:keytag];
     NSDictionary *query = @{
-        (id)kSecClass: (id)kSecClassKey,
-        (id)kSecAttrApplicationTag: biometricKeyTag,
-        (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
-        (id)kSecReturnRef: @YES,
-        (id)kSecUseOperationPrompt: @"Get publickey"
-        
+                            (id)kSecClass: (id)kSecClassKey,
+                            (id)kSecAttrApplicationTag: biometricKeyTag,
+                            (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+                            (id)kSecReturnRef: @YES,
+                            (id)kSecUseOperationPrompt: promptMessage
                             };
     SecKeyRef privateKey;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
-      if (status == errSecSuccess) {
-          id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
-          CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
-          NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
-          NSData *publicKeyDataWithHeader = [self addHeaderPublickey:publicKeyData];
-          NSString *publicKeyString = [publicKeyDataWithHeader base64EncodedStringWithOptions:0];
 
-          NSDictionary *result = @{
-            @"publicKey": publicKeyString,
-          };
-          resolve(result);
+    if (status == errSecSuccess) {
+      NSError *error;
+      NSMutableData *csrData = [NSMutableData data];
+      [csrData appendData:[subject dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
+        CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
+        NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
+            [csrData appendData:publicKeyData];
+        
+        NSData *signature = [self signData:csrData withPrivateKey:privateKey];
+        
+      if (signature != nil) {
+          [csrData appendData:signature];
+          
+        NSString *csr = [self convertToPEM:csrData];
+        NSDictionary *result = @{
+          @"success": @(YES),
+          @"csr": csr
+        };
+        resolve(result);
+      } else if (error.code == errSecUserCanceled) {
+        NSDictionary *result = @{
+          @"success": @(NO),
+          @"error": @"User cancellation"
+        };
+        resolve(result);
+      } else {
+        NSString *message = [NSString stringWithFormat:@"Signature error: %@", error];
+        NSDictionary *result = @{
+          @"success": @(NO),
+          @"error": message
+        };
+        reject(result);
       }
-      else{
-          NSString *message = [NSString stringWithFormat:@"Get public error: %@", @"No get publickey"];
-          reject(@"storage_error", message, nil);
-      }
+    } else {
+      NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
+      NSDictionary *result = @{
+          @"success": @(NO),
+          @"error": message
+        };
+        reject(result);
+    }
   });
+}
+
+- (NSData *)signData:(NSData *)data withPrivateKey:(SecKeyRef)privateKey {
+    CFErrorRef error = NULL;
+    NSData *signature = (NSData *)CFBridgingRelease(SecKeyCreateSignature(
+        privateKey,
+        kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256,
+        (__bridge CFDataRef)data,
+        &error
+    ));
+
+    if (!signature) {
+        NSError *err = CFBridgingRelease(error);
+        NSLog(@"Failed to sign data: %@", err);
+    }
+
+    return signature;
 }
 
 RCT_EXPORT_METHOD(deleteKeys:(NSString *)keytag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
