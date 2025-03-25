@@ -9,6 +9,7 @@
 #import <Security/Security.h>
 #import <React/RCTConvert.h>
 #import <Foundation/Foundation.h>
+#import <SCCSR.h>
 
 @implementation ReactNativeBiometrics
 
@@ -114,32 +115,100 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
 
 RCT_EXPORT_METHOD(getPublicKey:(NSString *)keytag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      NSData *biometricKeyTag = [self getBiometricKeyTag:keytag];
-    NSDictionary *query = @{
-        (id)kSecClass: (id)kSecClassKey,
-        (id)kSecAttrApplicationTag: biometricKeyTag,
-        (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
-        (id)kSecReturnRef: @YES,
-        (id)kSecUseOperationPrompt: @"Get publickey"
+    NSDictionary *result = @{
+        @"publicKey": @"ios",
+      };
+      resolve(result);
+    //   NSData *biometricKeyTag = [self getBiometricKeyTag:keytag];
+    // NSDictionary *query = @{
+    //     (id)kSecClass: (id)kSecClassKey,
+    //     (id)kSecAttrApplicationTag: biometricKeyTag,
+    //     (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+    //     (id)kSecReturnRef: @YES,
+    //     (id)kSecUseOperationPrompt: @"Get publickey"
         
+    //                         };
+    // SecKeyRef privateKey;
+    // OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
+    //   if (status == errSecSuccess) {
+    //       id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
+    //       CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
+    //       NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
+    //       NSData *publicKeyDataWithHeader = [self addHeaderPublickey:publicKeyData];
+    //       NSString *publicKeyString = [publicKeyDataWithHeader base64EncodedStringWithOptions:0];
+
+    //       NSDictionary *result = @{
+    //         @"publicKey": publicKeyString,
+    //       };
+    //       resolve(result);
+    //   }
+    //   else{
+    //       NSString *message = [NSString stringWithFormat:@"Get public error: %@", @"No get publickey"];
+    //       reject(@"storage_error", message, nil);
+    //   }
+  });
+}
+
+RCT_EXPORT_METHOD(createCsr: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
+    NSString *keytag = [RCTConvert NSString:params[@"keytag"]];
+    NSString *cn = [RCTConvert NSString:params[@"commonName"]];
+    NSString *ou = [RCTConvert NSString:params[@"organizationalUnit"]];
+    NSString *o = [RCTConvert NSString:params[@"organization"]];
+    NSString *l = [RCTConvert NSString:params[@"locality"]];
+    NSString *st = [RCTConvert NSString:params[@"state"]];
+    NSString *c = [RCTConvert NSString:params[@"country"]];
+      
+    if(cn == nil){
+        NSDictionary *result = @{
+            @"success": @(NO),
+            @"error": @"CommonName Không được để trống!"
+        };
+        resolve(result);
+    }
+      
+    NSData *biometricKeyTag = [self getBiometricKeyTag:keytag];
+    NSDictionary *query = @{
+                            (id)kSecClass: (id)kSecClassKey,
+                            (id)kSecAttrApplicationTag: biometricKeyTag,
+                            (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+                            (id)kSecReturnRef: @YES,
+                            (id)kSecUseOperationPrompt: promptMessage
                             };
     SecKeyRef privateKey;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
+
       if (status == errSecSuccess) {
           id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
           CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
           NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
-          NSData *publicKeyDataWithHeader = [self addHeaderPublickey:publicKeyData];
-          NSString *publicKeyString = [publicKeyDataWithHeader base64EncodedStringWithOptions:0];
-
-          NSDictionary *result = @{
-            @"publicKey": publicKeyString,
+          
+          SCCSR *sccsr = [[SCCSR alloc]init];
+          sccsr.commonName = cn;
+          sccsr.organizationName = o;
+          sccsr.organizationalUnitName= ou;
+          sccsr.countryName= c;
+          sccsr.stateName= st;
+          sccsr.localityName= l;
+          
+          
+          NSData *certificateRequest = [sccsr build:publicKeyData privateKey:privateKey];
+          NSString *str = [certificateRequest base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+          
+          if(str != nil){
+              NSDictionary *result = @{
+                  @"success": @(YES),
+                  @"csr": str
+              };
+              resolve(result);
+          }else{
+              NSDictionary *result = @{
+                  @"success": @(NO),
+                  @"error": @"Có lỗi xảy ra, sinh csr thất bại!"
+              };
+              resolve(result);
           };
-          resolve(result);
-      }
-      else{
-          NSString *message = [NSString stringWithFormat:@"Get public error: %@", @"No get publickey"];
-          reject(@"storage_error", message, nil);
       }
   });
 }
