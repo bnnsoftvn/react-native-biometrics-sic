@@ -14,9 +14,11 @@ import java.security.Signature;
 public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallback {
     private Promise promise;
     private String payload;
-    private String type;
+    private int type;
 
-    public CreateSignatureCallback(Promise promise, String payload, String type) {
+    public const int TYPE_BASE64 = 1;
+    public const int TYPE_STRING = 0;
+    public CreateSignatureCallback(Promise promise, String payload, int type) {
         super();
         this.promise = promise;
         this.payload = payload;
@@ -43,7 +45,7 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
         try {
             BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
             Signature cryptoSignature = cryptoObject.getSignature();
-            if (type != null && type.matches("base64")) {
+            if (type == TYPE_BASE64) {
                 byte[] byteb64 = Base64.decode(this.payload,0);
                 cryptoSignature.update(byteb64);
             }else{

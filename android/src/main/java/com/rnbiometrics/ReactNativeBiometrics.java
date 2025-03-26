@@ -231,10 +231,6 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                                 if(keytag.isEmpty()){
                                     promise.reject("keytag is empty","keytag is empty");
                                 }else{
-                                    String loai = "string";
-                                    if(type == 1){
-                                        loai = "base64";
-                                    }
                                     String cancelButtonText = params.getString("cancelButtonText");
                                     boolean allowDeviceCredentials = params.getBoolean("allowDeviceCredentials");
 
@@ -247,7 +243,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
                                     BiometricPrompt.CryptoObject cryptoObject = new BiometricPrompt.CryptoObject(signature);
 
-                                    AuthenticationCallback authCallback = new CreateSignatureCallback(promise, payload, loai);
+                                    AuthenticationCallback authCallback = new CreateSignatureCallback(promise, payload, type);
                                     FragmentActivity fragmentActivity = (FragmentActivity) getCurrentActivity();
                                     Executor executor = Executors.newSingleThreadExecutor();
                                     BiometricPrompt biometricPrompt = new BiometricPrompt(fragmentActivity, executor, authCallback);
