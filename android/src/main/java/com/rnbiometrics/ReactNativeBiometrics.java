@@ -122,6 +122,64 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     // }
 
     @ReactMethod
+    public void createCsr(final ReadableMap params, final Promise promise) {
+        if (isCurrentSDKMarshmallowOrLater()) {
+            UiThreadUtil.runOnUiThread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                String promptMessage = params.getString("promptMessage");
+                                String keytag = params.getString("keytag");
+                                String cn = params.hasKey("commonName") ? params.getString("commonName") : "";
+                                String ou = params.hasKey("organizationalUnit") ? params.getString("organizationalUnit") : "";
+                                String o = params.hasKey("organization") ? params.getString("organization") : "";
+                                String l = params.hasKey("locality") ? params.getString("locality") : "";
+                                String st = params.hasKey("state") ? params.getString("state") : "";
+                                String c = params.hasKey("country") ? params.getString("country") : "";
+
+                                if(keytag.isEmpty()){
+                                    WritableMap resultMap = new WritableNativeMap();
+                                    resultMap.putBoolean("success", false);
+                                    resultMap.putString("error", "keytag is empty");
+                                    promise.resolve(resultMap);
+                                }else{
+                                    String cancelButtonText = params.getString("cancelButtonText");
+
+                                    Signature signature = Signature.getInstance("SHA256withRSA");
+                                    KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                                    keyStore.load(null);
+
+                                    PublicKey publicKey = keyStore.getCertificate(keytag).getPublicKey();
+                                    PrivateKey privateKey = (PrivateKey) keyStore.getKey(keytag, null);
+                                    signature.initSign(privateKey);
+
+                                    BiometricPrompt.CryptoObject cryptoObject = new BiometricPrompt.CryptoObject(signature);
+
+                                    AuthenticationCallback authCallback = new CreateCsrCallback(promise,publicKey,signature,cn,ou,o,l,st,c);
+                                    FragmentActivity fragmentActivity = (FragmentActivity) getCurrentActivity();
+                                    Executor executor = Executors.newSingleThreadExecutor();
+                                    BiometricPrompt biometricPrompt = new BiometricPrompt(fragmentActivity, executor, authCallback);
+
+                                    biometricPrompt.authenticate(getPromptInfo(promptMessage, cancelButtonText, false), cryptoObject);
+                                }
+                            } catch (Exception e) {
+                                WritableMap resultMap = new WritableNativeMap();
+                                resultMap.putBoolean("success", false);
+                                resultMap.putString("error", "Error : " + e.getMessage());
+                                promise.resolve(resultMap);
+                            }
+                        }
+                    });
+        } else {
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("success", false);
+            resultMap.putString("error", "Cannot generate keys on android versions below 6.0");
+            promise.resolve(resultMap);
+        }
+    }
+
+    @ReactMethod
     public void getPublicKey(final String keytag, Promise promise) {
         if(keytag.isEmpty()){
             promise.reject("keytag is empty", "keytag is empty");

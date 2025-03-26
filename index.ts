@@ -210,6 +210,7 @@ export default class ReactNativeBiometrics {
     }
 
     createCsr(CreateCsrOptions: CreateCsrOptions): Promise<CreateCsrResult> {
+      CreateCsrOptions.cancelButtonText = CreateCsrOptions.cancelButtonText ?? 'Cancel'
       return bridge.createCsr(CreateCsrOptions)
     }
 

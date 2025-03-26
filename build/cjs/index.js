@@ -137,6 +137,8 @@ var ReactNativeBiometrics = /** @class */ (function () {
         return bridge.getPublicKey(keytag);
     };
     ReactNativeBiometrics.prototype.createCsr = function (CreateCsrOptions) {
+        var _a;
+        CreateCsrOptions.cancelButtonText = (_a = CreateCsrOptions.cancelButtonText) !== null && _a !== void 0 ? _a : 'Cancel';
         return bridge.createCsr(CreateCsrOptions);
     };
     /**
