@@ -180,35 +180,41 @@ RCT_EXPORT_METHOD(createCsr: (NSDictionary *)params resolver:(RCTPromiseResolveB
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
 
       if (status == errSecSuccess) {
-          id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
-          CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
-          NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
-          
-          SCCSR *sccsr = [[SCCSR alloc]init];
-          sccsr.commonName = cn;
-          sccsr.organizationName = o;
-          sccsr.organizationalUnitName= ou;
-          sccsr.countryName= c;
-          sccsr.stateName= st;
-          sccsr.localityName= l;
-          
-          
-          NSData *certificateRequest = [sccsr build:publicKeyData privateKey:privateKey];
-          NSString *str = [certificateRequest base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
-          
-          if(str != nil){
-              NSDictionary *result = @{
-                  @"success": @(YES),
-                  @"csr": str
-              };
-              resolve(result);
-          }else{
-              NSDictionary *result = @{
-                  @"success": @(NO),
-                  @"error": @"Có lỗi xảy ra, sinh csr thất bại!"
-              };
-              resolve(result);
-          };
+        id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
+        CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
+        NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
+        
+        SCCSR *sccsr = [[SCCSR alloc]init];
+        sccsr.commonName = cn;
+        sccsr.organizationName = o;
+        sccsr.organizationalUnitName= ou;
+        sccsr.countryName= c;
+        sccsr.stateName= st;
+        sccsr.localityName= l;
+        
+        NSData *certificateRequest = [sccsr build:publicKeyData privateKey:privateKey];
+        NSString *str = [certificateRequest base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+        
+        if(str != nil){
+            NSDictionary *result = @{
+                @"success": @(YES),
+                @"csr": str
+            };
+            resolve(result);
+        }else{
+            NSDictionary *result = @{
+                @"success": @(NO),
+                @"error": @"Có lỗi xảy ra, sinh csr thất bại!"
+            };
+            resolve(result);
+        };
+      }else{
+        NSString *message = [NSString stringWithFormat:@"Error status : %d", (int)status];
+        NSDictionary *result = @{
+            @"success": @(NO),
+            @"error": message
+        };
+        resolve(result);
       }
   });
 }

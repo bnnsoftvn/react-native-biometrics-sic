@@ -21,6 +21,24 @@ interface CreateKeysResult {
   publicKey: string
 }
 
+interface CreateCsrOptions {
+  promptMessage: string
+  keytag: string
+  commonName: string
+  organizationalUnit?: string
+  organization?: string
+  locality?: string
+  state?: string
+  country?: string
+  cancelButtonText?: string
+}
+
+interface CreateCsrResult {
+  success: boolean
+  csr?: string
+  error?: string
+}
+
 interface PublicKeysResult {
   publicKey: string
 }
@@ -105,6 +123,10 @@ export module ReactNativeBiometricsLegacy {
     return new ReactNativeBiometrics().getPublicKey(keytag)
   }
 
+  export function createCsr(CreateCsrOptions: CreateCsrOptions): Promise<CreateCsrResult> {
+    return new ReactNativeBiometrics().createCsr(CreateCsrOptions)
+  }
+
   /**
    * Returns promise that resolves to an object with object.keysExists = true | false
    * indicating if the keys were found to exist or not
@@ -185,6 +207,10 @@ export default class ReactNativeBiometrics {
 
     getPublicKey(keytag: string): Promise<PublicKeysResult> {
       return bridge.getPublicKey(keytag)
+    }
+
+    createCsr(CreateCsrOptions: CreateCsrOptions): Promise<CreateCsrResult> {
+      return bridge.createCsr(CreateCsrOptions)
     }
 
     /**
