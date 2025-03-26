@@ -16,8 +16,8 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
     private String payload;
     private int type;
 
-    public const int TYPE_BASE64 = 1;
-    public const int TYPE_STRING = 0;
+    public static final int TYPE_BASE64 = 1;
+    public static final int TYPE_STRING = 0;
     public CreateSignatureCallback(Promise promise, String payload, int type) {
         super();
         this.promise = promise;
