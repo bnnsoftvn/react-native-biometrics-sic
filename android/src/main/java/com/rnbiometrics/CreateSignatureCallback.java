@@ -43,7 +43,7 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
         try {
             BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
             Signature cryptoSignature = cryptoObject.getSignature();
-            if(type == "base64"){
+            if (type != null && type.matches("base64")) {
                 byte[] byteb64 = Base64.decode(this.payload,0);
                 cryptoSignature.update(byteb64);
             }else{
