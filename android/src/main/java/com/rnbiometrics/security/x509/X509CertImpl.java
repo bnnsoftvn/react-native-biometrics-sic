@@ -604,9 +604,9 @@ public class X509CertImpl extends X509Certificate implements com.rnbiometrics.se
         com.rnbiometrics.security.x509.X509AttributeName attr = new com.rnbiometrics.security.x509.X509AttributeName(name);
         String id = attr.getPrefix();
         if (!(id.equalsIgnoreCase(NAME))) {
-            throw new CertificateParsingException("Invalid root of "
-                          + "attribute name, expected [" + NAME +
-                          "], received " + "[" + id + "]");
+            throw new CertificateParsingException("Invalid root of attribute name, expected, received "
+
+                         );
         }
         attr = new com.rnbiometrics.security.x509.X509AttributeName(attr.getSuffix());
         id = attr.getPrefix();
@@ -639,8 +639,8 @@ public class X509CertImpl extends X509Certificate implements com.rnbiometrics.se
             else
                 return null;
         } else {
-            throw new CertificateParsingException("Attribute name not "
-                 + "recognized or get() not allowed for the same: " + id);
+            throw new CertificateParsingException("Attribute name not recognized or get() not allowed for the same"
+                 );
         }
     }
 

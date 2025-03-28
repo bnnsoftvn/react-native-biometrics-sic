@@ -213,7 +213,7 @@ public class CertificateExtensions implements com.rnbiometrics.security.x509.Cer
     public Object get(String name) throws IOException {
         Object obj = map.get(name);
         if (obj == null) {
-            throw new IOException("No extension found with name " + name);
+            throw new IOException("No extension found with name ");
         }
         return (obj);
     }
@@ -226,7 +226,7 @@ public class CertificateExtensions implements com.rnbiometrics.security.x509.Cer
     public void delete(String name) throws IOException {
         Object obj = map.get(name);
         if (obj == null) {
-            throw new IOException("No extension found with name " + name);
+            throw new IOException("No extension found with name " );
         }
         map.remove(name);
     }

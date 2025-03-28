@@ -576,7 +576,7 @@ public class X509CertInfo implements CertAttrSet<String> {
         int attr = attributeMap(attrName.getPrefix());
         if (attr == 0) {
             throw new CertificateParsingException(
-                          "Attribute name not recognized: " + name);
+                          "Attribute name not recognized ");
         }
         String suffix = attrName.getSuffix();
 

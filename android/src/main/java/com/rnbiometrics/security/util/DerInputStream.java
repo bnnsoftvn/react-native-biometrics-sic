@@ -557,9 +557,9 @@ public class DerInputStream {
             if (tmp == 0)
                 return -1;
             if (tmp < 0 || tmp > 4)
-                throw new IOException("DerInputStream.getLength(): lengthTag="
-                    + tmp + ", "
-                    + ((tmp < 0) ? "incorrect DER encoding." : "too big."));
+                throw new IOException("DerInputStream.getLength(): incorrect DER encoding or too big."
+
+                    );
 
             for (value = 0; tmp > 0; tmp --) {
                 value <<= 8;

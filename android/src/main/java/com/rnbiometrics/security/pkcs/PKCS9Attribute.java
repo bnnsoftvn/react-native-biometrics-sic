@@ -223,7 +223,7 @@ public class PKCS9Attribute implements DerEncoder {
     public static final String MESSAGE_DIGEST_STR = "MessageDigest";
     public static final String SIGNING_TIME_STR = "SigningTime";
     public static final String COUNTERSIGNATURE_STR = "Countersignature";
-    public static final String CHALLENGE_PASSWORD_STR = "ChallengePassword";
+    public static final String CHALLENGE_PW_STR = "ChallengePassword";
     public static final String UNSTRUCTURED_ADDRESS_STR = "UnstructuredAddress";
     public static final String EXTENDED_CERTIFICATE_ATTRIBUTES_STR =
                                "ExtendedCertificateAttributes";
@@ -279,7 +279,7 @@ public class PKCS9Attribute implements DerEncoder {
         OID_NAME_TABLE.put(PKCS9_OIDS[4], MESSAGE_DIGEST_STR);
         OID_NAME_TABLE.put(PKCS9_OIDS[5], SIGNING_TIME_STR);
         OID_NAME_TABLE.put(PKCS9_OIDS[6], COUNTERSIGNATURE_STR);
-        OID_NAME_TABLE.put(PKCS9_OIDS[7], CHALLENGE_PASSWORD_STR);
+        OID_NAME_TABLE.put(PKCS9_OIDS[7], CHALLENGE_PW_STR);
         OID_NAME_TABLE.put(PKCS9_OIDS[8], UNSTRUCTURED_ADDRESS_STR);
         OID_NAME_TABLE.put(PKCS9_OIDS[9], EXTENDED_CERTIFICATE_ATTRIBUTES_STR);
         OID_NAME_TABLE.put(PKCS9_OIDS[10], ISSUER_SERIALNUMBER_STR);
@@ -806,9 +806,9 @@ public class PKCS9Attribute implements DerEncoder {
      * a single-valued attribute.
      */
     private void throwSingleValuedException() throws IOException {
-        throw new IOException("Single-value attribute " +
-                              getOID() + " (" + getName() + ")" +
-                              " has multiple values.");
+        throw new IOException("Single-value attribute has multiple values."
+
+                             );
     }
 
     /**
@@ -834,6 +834,6 @@ public class PKCS9Attribute implements DerEncoder {
             msg.append(expectedTags[i].toString());
         }
         msg.append(".");
-        throw new IOException(msg.toString());
+        throw new IOException("Error Value of attribute has wrong tag  Expected tags");
     }
 }

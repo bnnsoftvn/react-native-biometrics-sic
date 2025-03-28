@@ -21,7 +21,6 @@
 
 package com.rnbiometrics.security.provider;
 
-import com.rnbiometrics.security.pkcs12.PKCS12KeyStore;
 import com.rnbiometrics.security.provider.JavaKeyStore.JKS;
 import com.rnbiometrics.security.provider.JavaKeyStore.CaseExactJKS;
 
@@ -33,7 +32,6 @@ public class JavaKeyStoreProvider extends Provider {
         super("JKS", 1.0D, "Java KeyStore");
         this.put("KeyStore.JKS", JKS.class.getName());
         this.put("KeyStore.CaseExactJKS", CaseExactJKS.class.getName());
-        this.put("KeyStore.PKCS12", PKCS12KeyStore.class.getName());
         Security.setProperty("keystore.type", "jks");
     }
 }

@@ -444,7 +444,7 @@ public class DerValue {
      */
     public com.rnbiometrics.security.util.ObjectIdentifier getOID() throws IOException {
         if (tag != tag_ObjectId)
-            throw new IOException("DerValue.getOID, not an OID " + tag);
+            throw new IOException("DerValue.getOID, not an OID ");
         return new ObjectIdentifier(buffer);
     }
 
@@ -844,7 +844,7 @@ public class DerValue {
     public com.rnbiometrics.security.util.DerInputStream toDerInputStream() throws IOException {
         if (tag == tag_Sequence || tag == tag_Set)
             return new DerInputStream(buffer);
-        throw new IOException("toDerInputStream rejects tag type " + tag);
+        throw new IOException("toDerInputStream rejects tag type ");
     }
 
     /**

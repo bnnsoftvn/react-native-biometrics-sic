@@ -58,7 +58,7 @@ public class OIDMap {
                                           SubjectKeyIdentifierExtension.NAME;
     private static final String KEY_USAGE           = ROOT + "." +
                                           KeyUsageExtension.NAME;
-    private static final String PRIVATE_KEY_USAGE   = ROOT + "." +
+    private static final String PK_USAGE   = ROOT + "." +
                                           PrivateKeyUsageExtension.NAME;
     private static final String POLICY_MAPPINGS     = ROOT + "." +
                                           PolicyMappingsExtension.NAME;
@@ -118,7 +118,7 @@ public class OIDMap {
                     "SubjectKeyIdentifierExtension");
         addInternal(KEY_USAGE, com.rnbiometrics.security.x509.PKIXExtensions.KeyUsage_Id,
                     "KeyUsageExtension");
-        addInternal(PRIVATE_KEY_USAGE, com.rnbiometrics.security.x509.PKIXExtensions.PrivateKeyUsage_Id,
+        addInternal(PK_USAGE, com.rnbiometrics.security.x509.PKIXExtensions.PrivateKeyUsage_Id,
                     "PrivateKeyUsageExtension");
         addInternal(SUB_ALT_NAME, com.rnbiometrics.security.x509.PKIXExtensions.SubjectAlternativeName_Id,
                     "SubjectAlternativeNameExtension");
